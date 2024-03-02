@@ -5,7 +5,9 @@ import { initialCards } from './components/cards.js'
 
 const places = document.querySelector('.places');
 const placesList = places.querySelector('.places__list');
-
+const popupTypeImage = document.querySelector('.popup_type_image');
+const popupImg = popupTypeImage.querySelector('.popup__image');
+const popupCaption = popupTypeImage.querySelector('.popup__caption');
 
 
 // @todo: Функция создания карточки
@@ -18,9 +20,9 @@ function createNewCard (evt) {
   const cardAlt = evt.target.getAttribute('alt');
   const cardTitle = card.querySelector('.card__title').textContent;
  
-  popupTypeImage.querySelector('.popup__image').src = cardSrc; 
-  popupTypeImage.querySelector('.popup__caption').alt = cardAlt;
-  popupTypeImage.querySelector('.popup__caption').textContent = cardTitle;
+  popupImg.src = cardSrc; 
+  popupImg.alt = cardAlt; 
+  popupCaption.textContent = cardTitle;
 };
 
 initialCards.forEach(element => {
@@ -36,7 +38,6 @@ const jobInput = document.querySelector('.popup__input_type_description');
 const profileDescription = document.querySelector('.profile__description'); 
 const profileAddButton = document.querySelector('.profile__add-button'); 
 const popupTypeNewCard = document.querySelector('.popup_type_new-card');
-const popupTypeImage = document.querySelector('.popup_type_image');
 const popupsClose = document.querySelectorAll('.popup__close');
 
 import { openPopup, closePopup } from './components/modal.js';
