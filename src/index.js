@@ -39,27 +39,51 @@ const profileDescription = document.querySelector('.profile__description');
 const profileAddButton = document.querySelector('.profile__add-button'); 
 const popupTypeNewCard = document.querySelector('.popup_type_new-card');
 const popupsClose = document.querySelectorAll('.popup__close');
+const validationConfig = { 
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+};
 
 import { openPopup, closePopup } from './components/modal.js';
+import { enableValidation , clearValidation } from './components/validation.js';
 
 function openTypeProfile() {
   openPopup(popupTypeEdit);
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
+  clearValidation(formElement,validationConfig); 
+  enableValidation(validationConfig); 
 };
 
-  profileEditButton.addEventListener("click", openTypeProfile);
-  profileAddButton.addEventListener("click", () => openPopup(popupTypeNewCard));
+function openNewCardPopup() {
+  openPopup(popupTypeNewCard);
+  clearValidation(formElement, validationConfig);
+  enableValidation(validationConfig);
+}
+
+profileAddButton.addEventListener("click", openNewCardPopup);
+
+profileEditButton.addEventListener("click", openTypeProfile);
+
+//profileAddButton.addEventListener("click", () => openPopup(popupTypeNewCard));
     
+const formElement = document.forms['edit-profile']; 
+
 // @todo: Закрытие модального окна
 
 popupsClose.forEach((button) => {
   const popup = button.closest('.popup');
-  button.addEventListener("click", () => closePopup(popup));
+  button.addEventListener("click", () => {
+    closePopup(popup);
+    clearValidation(formElement,validationConfig);
+  });
 });
 
 // @todo: Редактирование имени и информации о себе
-const formElement = document.forms['edit-profile']; 
 
 function handleFormSubmit(evt) {
   evt.preventDefault();
@@ -67,6 +91,7 @@ function handleFormSubmit(evt) {
   jobInput.value;
   profileTitle.textContent = nameInput.value;
   profileDescription.textContent = jobInput.value;
+  closePopup(popupTypeEdit); 
 }
 
 formElement.addEventListener('submit', handleFormSubmit); 
@@ -92,3 +117,5 @@ function createNewPlace(evt) {
 };
 
 formNewPlace.addEventListener('submit', createNewPlace); 
+
+
