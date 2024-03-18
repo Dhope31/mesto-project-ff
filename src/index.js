@@ -51,18 +51,19 @@ const validationConfig = {
 import { openPopup, closePopup } from './components/modal.js';
 import { enableValidation , clearValidation } from './components/validation.js';
 
+enableValidation(validationConfig);
+
 function openTypeProfile() {
   openPopup(popupTypeEdit);
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
   clearValidation(formElement,validationConfig); 
-  enableValidation(validationConfig); 
+   
 };
 
 function openNewCardPopup() {
   openPopup(popupTypeNewCard);
   clearValidation(formElement, validationConfig);
-  enableValidation(validationConfig);
 }
 
 profileAddButton.addEventListener("click", openNewCardPopup);
