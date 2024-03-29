@@ -1,0 +1,13 @@
+.profile__avatar {
+  position: relative;
+}
+
+.profile__avatar-edit-icon {
+  position: absolute;
+  display: none;
+  /* other styles for your icon */
+}
+
+.profile__avatar:hover .profile__avatar-edit-icon {
+   display: block;
+}
