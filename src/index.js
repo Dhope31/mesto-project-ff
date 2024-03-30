@@ -1,9 +1,9 @@
 import './pages/index.css';
-import { initialCards } from './components/cards.js';
+//import { initialCards } from './components/cards.js';
 import {createCard, deleteCard, handleLikes} from './components/card.js';
 import { openPopup, closePopup } from './components/modal.js';
 import { enableValidation , clearValidation } from './components/validation.js';
-import { getUserProfile, config, apiRoutes, getCards, updateUserProfile, addCard, updateAvatar } from './components/Api.js';
+import { getUserProfile, getCards, updateUserProfile, addCard, updateAvatar } from './components/Api.js';
 
 // @todo: DOM узлы
 const places = document.querySelector('.places');
@@ -35,8 +35,8 @@ const validationConfig = {
   errorClass: 'popup__error_visible'
 };
 
-// @todo: Функция создания карточки
-function createNewCard (evt) {  
+// @todo: Функция открытия большой картинки
+function openImagePopup (evt) {  
   openPopup(popupTypeImage);
   const card = evt.target.closest('.card');
   const cardSrc = evt.target.getAttribute('src');
@@ -47,10 +47,6 @@ function createNewCard (evt) {
   popupImg.alt = cardAlt; 
   popupCaption.textContent = cardTitle;
 };
-
-//initialCards.forEach(element => {
-  //placesList.append(createCard(element, deleteCard, likeCard, createNewCard));
-//});
 
 // @todo: Открытие модального окна
 enableValidation(validationConfig);
@@ -98,54 +94,52 @@ popupsClose.forEach((button) => {
 });
 
 // @todo: Редактирование имени и информации о себе
-function handleFormSubmit(evt) {
-  function makeRequestCard () {
+function handleProfileFormSubmit(evt) {
+  function requestProfileUpdate () {
     evt.preventDefault();
   
   const name = nameInput.value;
   const about = jobInput.value;
   
-  updateUserProfile(config, apiRoutes, name, about)
-    .then((newCardData) => {
-      console.log(newCardData);
+  updateUserProfile(name, about)
+    .then((newUserData) => {
+      console.log(newUserData);
       // обновляем данные пользователя на странице после успешного ответа от сервера
-      profileTitle.textContent = newCardData.name;
-      profileDescription.textContent = newCardData.about;
+      profileTitle.textContent = newUserData.name;
+      profileDescription.textContent = newUserData.about;
     })
     .catch((error) => console.log(`Ошибка: ${error}`)); // Если есть ошибка, выводим ее в консоль
-
+    
   closePopup(popupTypeEdit); 
   }
   // Обработка отправки формы с использованием вспомогательной функции
-  handleSubmit(makeRequestCard, evt);
+  handleSubmit(requestProfileUpdate, evt);
 }  
 
-formElement.addEventListener('submit', handleFormSubmit); 
+formElement.addEventListener('submit', handleProfileFormSubmit); 
+
+let userId = "";
 
 // @todo: Добавление карточки
 function createNewPlace(evt) {
 
   function makeRequest() {
-  evt.preventDefault();
-  
-  const newCardData = {
-    name: popupInputTypeCardName.value,
-    link: popupInputTypeUrl.value,
-  };
-  
-  addCard(config, apiRoutes, newCardData.name, newCardData.link)
-    .then((cardData) => {
-      // cardData - это данные новой карточки, возвращенные сервером
-      console.log(cardData);
-
-      // Если запрос прошел успешно, создайте элемент карточки и добавьте его на страницу
-      const newCardElement = createCard(cardData, deleteCard, handleLikes, createNewCard);
-      placesList.prepend(newCardElement);
-
-      evt.target.reset();
-      closePopup(popupTypeNewCard);
-    })
-    .catch((error) => console.log(error)); // Выводим сообщение об ошибке
+    evt.preventDefault();
+    
+    const newCardData = {
+      name: popupInputTypeCardName.value,
+      link: popupInputTypeUrl.value,
+    };
+    
+    return addCard(newCardData.name, newCardData.link)
+      .then((cardData) => {
+        console.log(cardData);
+        const newCardElement = createCard(cardData, deleteCard, handleLikes, userId);
+        placesList.prepend(newCardElement);
+        console.log('Closing the popup');
+        closePopup(popupTypeNewCard);
+      })
+      .catch((error) => console.log(error));
   }
 
     handleSubmit(makeRequest, evt);
@@ -153,60 +147,58 @@ function createNewPlace(evt) {
 
 formNewPlace.addEventListener('submit', createNewPlace); 
 
-
+const avatarFormElement = document.querySelector('.popup__form[name="avatar"]');
 
 function handleAvatarFormSubmit(evt) {
 
   function makeRequestAvatar() {
-  evt.preventDefault();
+    evt.preventDefault();
+    
+    const avatarLink = avatarInput.value;
   
-  const avatarLink = avatarInput.value;
-
-  updateAvatar(config, apiRoutes, avatarLink)
-    .then((updatedUserData) => {
-      console.log(updatedUserData);
-      // обновляем аватар пользователя на странице после успешного ответа от сервера
-      profileImg.style.backgroundImage = `url(${updatedUserData.avatar})`;
-    })
-    .catch((error) => console.log(`Ошибка: ${error}`));
-
-  closePopup(popupNewAvatar);
+    return updateAvatar(avatarLink)
+      .then((updatedUserData) => {
+        // обновляем аватар пользователя на странице после успешного ответа от сервера
+        profileImg.style.backgroundImage = `url(${updatedUserData.avatar})`;
+      })
+      .catch((error) => console.log(`Ошибка: ${error}`))
+      .finally(() => {
+        closePopup(popupNewAvatar);
+      });
   }
+
   handleSubmit(makeRequestAvatar, evt);
 } 
 
-const avatarFormElement = document.querySelector('.popup__form[name="avatar"]');
+
 avatarFormElement.addEventListener('submit', handleAvatarFormSubmit);
 
 
 
 //Api
 // Данные пользователя
-
-let userId = "";
-
-function setUserInfo(newCardData) {
-  console.log(newCardData); // для вывода всех данных от сервера
-  if (newCardData) {
-    profileTitle.textContent = newCardData.name;
-    profileDescription.textContent = newCardData.about;
-    profileImg.style.backgroundImage = `url(${newCardData.avatar})`;
-    userId = newCardData._id;
+function setUserInfo(userData) {
+  console.log(userData); // для вывода всех данных от сервера
+  if (userData) {
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
+    profileImg.style.backgroundImage = `url(${userData.avatar})`;
+    userId = userData._id;
   }
   console.log(userId); // вывод userId после его установки
 }
 
 // Промис получения информации о пользователе и карточках
-Promise.all([getUserProfile(config, apiRoutes), getCards(config, apiRoutes)]) 
-  .then(([newCardData, cardsData]) => {
+Promise.all([getUserProfile(), getCards()]) 
+  .then(([userData, cardsData]) => {
     // обрабатываем данные пользователя
-    setUserInfo(newCardData); // используем функцию setUserInfo для установки данных пользователя
+    setUserInfo(userData); // используем функцию setUserInfo для установки данных пользователя
 
     placesList.innerHTML = "";
     // обрабатываем данные карточек
     cardsData.forEach(element => {
       // Создаем карточку на основе данных с сервера и добавляем ее на страницу
-      placesList.append(createCard(element, deleteCard, handleLikes, createNewCard, userId));
+      placesList.append(createCard(element, deleteCard, handleLikes, openImagePopup, userId));
     });
   })
   .catch(error => console.log(`Ошибка: ${error}`)); 

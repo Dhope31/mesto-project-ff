@@ -27,18 +27,17 @@ const doFetch = (url, options) => {
 };
 
 // Получение информации о пользователе
-export const getUserProfile = (config, apiRoutes) => {
+export const getUserProfile = () => {
   return doFetch (`${config.baseUrl}/${apiRoutes.user}`, { headers: config.headers });
 }
 
 // Загрузка карточек с сервера
-export const getCards = (config, apiRoutes) => {
+export const getCards = () => {
   const options = {
     method: "GET",
     headers: config.headers
   };
   return doFetch (`${config.baseUrl}/${apiRoutes.cards}`, options)
-    .then(response => response);  // если ответ сервера пустой, вернуть пустой массив
 }
 
 export function renderCards(cards, userId) {
@@ -48,7 +47,7 @@ export function renderCards(cards, userId) {
 }
 
 // Обновление информации о пользователе
-export const updateUserProfile = (config, apiRoutes, name, about) => {
+export const updateUserProfile = (name, about) => {
   const options = {
     method: "PATCH",
     headers: config.headers,
@@ -61,7 +60,7 @@ export const updateUserProfile = (config, apiRoutes, name, about) => {
 }
 
 // Добавление новой карточки на сервер
-export const addCard = (config, apiRoutes, name, link) => {
+export const addCard = (name, link) => {
   const options = {
     method: "POST",
     headers: config.headers,
@@ -74,7 +73,7 @@ export const addCard = (config, apiRoutes, name, link) => {
 };
 
 //добавление и удаление лайка
-export const addLikeCard = (config, apiRoutes, id)  => {
+export const addLikeCard = (id)  => {
   const options = {
     method: "PUT",
     headers: config.headers
@@ -82,7 +81,7 @@ export const addLikeCard = (config, apiRoutes, id)  => {
   return doFetch (`${config.baseUrl}${apiRoutes.likes(id)}`, options);
 };
 
-export const deleteLikeCard = (config, apiRoutes, id) => {
+export const deleteLikeCard = (id) => {
   const options = {
     method: "DELETE",
     headers: config.headers
@@ -91,7 +90,7 @@ export const deleteLikeCard = (config, apiRoutes, id) => {
 };
 
 //удаление карточки
-export const deleteCardApi = (config, apiRoutes, id) => {
+export const deleteCardApi = (id) => {
   const options = {
     method: "DELETE",
     headers: config.headers
@@ -100,7 +99,7 @@ export const deleteCardApi = (config, apiRoutes, id) => {
 };
 
 //обновление аватара
-export const updateAvatar = (config, apiRoutes, avatarLink) => {
+export const updateAvatar = (avatarLink) => {
   const options = {
     method: "PATCH",
     headers: config.headers,
