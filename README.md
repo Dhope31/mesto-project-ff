@@ -1,1 +1,1 @@
-https://github.com/Dhope31/mesto-project-ff.git
+https://Dhope31.github.io/mesto-project-ff
